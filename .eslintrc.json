@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "smarter-tabs"
+  ],
+	"rules": {
+    "brace-style":               ["warn", "1tbs", { "allowSingleLine": true }],
+		"no-mixed-spaces-and-tabs":  ["warn", "smart-tabs"],
+		"smarter-tabs/smarter-tabs": "warn"
+	}
+}
