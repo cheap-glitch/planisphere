@@ -1,4 +1,4 @@
-import { generateSitemaps } from '../index';
+import { generateSitemaps } from '../src/index';
 import { indexes, wrapSitemap } from './helpers';
 
 describe("generateSitemaps", () => {
