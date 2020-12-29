@@ -1,6 +1,6 @@
 {
   "name": "planisphere",
-  "description": "@TODO.",
+  "description": "A straightforward sitemap generator written in TypeScript.",
   "version": "0.0.1",
   "license": "ISC",
   "repository": {
@@ -12,6 +12,10 @@
   },
   "author": "cheap glitch <cheap.glitch@gmail.com> (https://github.com/cheap-glitch)",
   "homepage": "https://github.com/cheap-glitch/planisphere#readme",
+  "keywords": [
+    "sitemap",
+    "sitemap-generator"
+  ],
   "main": "./build/index.min.js",
   "directories": {
     "test": "test"
