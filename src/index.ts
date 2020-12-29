@@ -83,7 +83,10 @@ export function generateSitemapIndex(sitemapFilenames: Array<string>, options: P
 export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
 	const baseUrl       = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
 	const trailingSlash = options?.trailingSlash ?? undefined;
-	// const pretty  = options?.pretty ?? false;
+	const pretty        = options?.pretty ?? false;
+
+	const NL  = pretty ? '\n' : '';
+	const TAB = pretty ? '\t' : '';
 
 	const sitemaps = [];
 	for (let offset = 0; offset < Math.ceil(urls.length / MAX_NB_URLS_IN_SITEMAP); offset++) {
@@ -102,15 +105,19 @@ export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Part
 			const changefreq = ('changefreq' in url) ? url.changefreq : (options?.defaults?.changefreq ?? undefined);
 			const priority   = ('priority'   in url) ? url.priority   : (options?.defaults?.priority   ?? undefined);
 
-			sitemapUrls.push(xmlTag('url',
-				xmlTag('loc', formatUrlLoc(loc)) +
-
-				(lastmod    !== undefined ? xmlTag('lastmod',    formatUrlLastmod(lastmod))  : '') +
-				(changefreq !== undefined ? xmlTag('changefreq', changefreq)                 : '') +
-				(priority   !== undefined ? xmlTag('priority',   formatUrPriority(priority)) : '')
+			sitemapUrls.push(TAB + xmlTag('url', NL +
+				TAB + TAB + xmlTag('loc', formatUrlLoc(loc)) + NL +
+				(lastmod    !== undefined ? TAB + TAB + xmlTag('lastmod',    formatUrlLastmod(lastmod))  + NL : '') +
+				(changefreq !== undefined ? TAB + TAB + xmlTag('changefreq', changefreq)                 + NL : '') +
+				(priority   !== undefined ? TAB + TAB + xmlTag('priority',   formatUrPriority(priority)) + NL : '') + TAB
 			));
 		}
-		sitemaps.push(XML_DOCTYPE + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + sitemapUrls.join('') + '</urlset>');
+		sitemaps.push(
+			XML_DOCTYPE + NL +
+			'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL +
+				sitemapUrls.join(NL) + NL +
+			'</urlset>'
+		);
 	}
 
 	return sitemaps;

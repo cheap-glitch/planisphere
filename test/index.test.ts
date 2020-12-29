@@ -1,4 +1,4 @@
-import { generateSitemaps } from '../src/index';
+import { generateSitemaps, generateSitemapIndex } from '../src/index';
 import { indexes, wrapSitemap } from './helpers';
 
 describe("generateSitemaps", () => {
@@ -141,17 +141,16 @@ describe("generateSitemaps", () => {
 	it("prioritizes per-URL meta tags over global defaults", () => { // {{{
 
 		expect(generateSitemaps([{
-				loc:        'https://example.com/about',
-				changefreq: 'monthly',
-				lastmod:    '2020-01-01',
-				priority:   0.3,
-			}], {
-				defaults: {
-					changefreq: 'never',
-					priority:   0.8,
-				},
-			}
-		))
+			loc:        'https://example.com/about',
+			changefreq: 'monthly',
+			lastmod:    '2020-01-01',
+			priority:   0.3,
+		}], {
+			defaults: {
+				changefreq: 'never',
+				priority:   0.8,
+			},
+		}))
 		.toEqual([wrapSitemap([
 			'<url>',
 			'<loc>https://example.com/about</loc>',
@@ -214,6 +213,26 @@ describe("generateSitemaps", () => {
 			wrapSitemap(indexes(50000).map(i => `<url><loc>https://example.com/user/${i+50001}</loc></url>`)),
 			wrapSitemap('<url><loc>https://example.com/user/100001</loc></url>'),
 		]);
+
+	}); // }}}
+
+	it("generates formatted XML if pretty is set to `true`", () => { // {{{
+
+		expect(generateSitemaps(['/', '/about'], {
+			baseUrl:  'https://example.com',
+			defaults: { priority: 0.7 },
+			pretty:   true,
+		}))
+		.toEqual([wrapSitemap([
+			'\t<url>',
+			'\t\t<loc>https://example.com</loc>',
+			'\t\t<priority>0.7</priority>',
+			'\t</url>',
+			'\t<url>',
+			'\t\t<loc>https://example.com/about</loc>',
+			'\t\t<priority>0.7</priority>',
+			'\t</url>',
+		], true)]);
 
 	}); // }}}
 
