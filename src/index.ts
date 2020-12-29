@@ -18,6 +18,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+import { resolve } from 'path';
 import { writeFileSync } from 'fs';
 
 const XML_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -28,6 +29,13 @@ export type SitemapUrlLastmod    = Date | number | string;
 export type SitemapUrlChangefreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
 export type SitemapUrlPriority   = number | string;
 
+interface GenerateOptions {
+	defaults:      Partial<SitemapUrl>,
+	baseUrl:       string,
+	trailingSlash: boolean,
+	pretty:        boolean,
+}
+
 export interface SitemapUrl {
 	loc:         SitemapUrlLoc,
 	lastmod?:    SitemapUrlLastmod,
@@ -35,18 +43,44 @@ export interface SitemapUrl {
 	priority?:   SitemapUrlPriority,
 }
 
-export function writeSitemaps(destination: string, sitemaps: Array<string>): void {
-	sitemaps.forEach(sitemap => writeFileSync(destination, sitemap));
-	if (sitemaps.length > 1) {
-		const sitemapIndexes = sitemaps.map((_, index) => `sitemap-${(index + 1).toString().padStart(2, '0')}.xml`);
-		writeFileSync(destination, XML_DOCTYPE + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + sitemapIndexes.join('') + '</sitemapindex>');
+export function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): void {
+	const sitemaps = generateSitemaps(urls, options);
+	if (sitemaps.length === 0) {
+		return;
+	}
+	if (sitemaps.length === 1) {
+		writeFileSync(resolve(destination, 'sitemap.xml'), sitemaps[0]);
+		return;
+	}
+
+	const sitemapFilenames = sitemaps.map((_, index) => `sitemap-part-${(index + 1).toString().padStart(2, '0')}.xml`);
+	sitemaps.forEach((sitemap, index) => writeFileSync(resolve(destination, sitemapFilenames[index]), sitemap));
+
+	const sitemapIndex = generateSitemapIndex(sitemapFilenames, options);
+	if (sitemapIndex) {
+		writeFileSync(resolve(destination, 'sitemap.index.xml'), sitemapIndex);
 	}
 }
 
-export function generateSitemaps(
-	urls:    Array<string | SitemapUrl>,
-	options: { defaults?: Partial<SitemapUrl>, baseUrl?: string, trailingSlash?: boolean, pretty?: boolean } = {}
-): Array<string> {
+export function generateSitemapIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}): string | undefined {
+	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
+
+	if (sitemapFilenames.length <= 1) {
+		return undefined;
+	}
+
+	const nowDate  = (new Date()).toISOString();
+	const sitemaps = sitemapFilenames.map(filename => {
+		return xmlTag('sitemap',
+			xmlTag('loc',     baseUrl + filename) +
+			xmlTag('lastmod', nowDate)
+		);
+	});
+
+	return XML_DOCTYPE + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + sitemaps.join('') + '</sitemapindex>'
+}
+
+export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
 	const baseUrl       = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
 	const trailingSlash = options?.trailingSlash ?? undefined;
 	// const pretty  = options?.pretty ?? false;
