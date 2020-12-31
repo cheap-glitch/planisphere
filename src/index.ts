@@ -62,22 +62,25 @@ export function writeSitemaps(destination: string, urls: Array<string | SitemapU
 	}
 }
 
-export function generateSitemapIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}): string | undefined {
-	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
-
+export function generateSitemapIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
 	if (sitemapFilenames.length <= 1) {
 		return undefined;
 	}
 
-	const nowDate  = (new Date()).toISOString();
+	const baseUrl = options.baseUrl  ? options.baseUrl.replace(/\/+$/, '') : '';
+	const pretty  = options?.pretty ?? false;
+
+	const NL  = pretty ? '\n' : '';
+	const TAB = pretty ? '\t' : '';
+
 	const sitemaps = sitemapFilenames.map(filename => {
-		return xmlTag('sitemap',
-			xmlTag('loc',     baseUrl + filename) +
-			xmlTag('lastmod', nowDate)
+		return TAB + xmlTag('sitemap', NL +
+			TAB + TAB + xmlTag('loc',     [baseUrl, filename].filter(Boolean).join('/')) + NL +
+			TAB + TAB + xmlTag('lastmod', formatUrlLastmod(lastmod)) + NL + TAB
 		);
 	});
 
-	return XML_DOCTYPE + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + sitemaps.join('') + '</sitemapindex>'
+	return XML_DOCTYPE + NL + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL + sitemaps.join(NL) + NL + '</sitemapindex>'
 }
 
 export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
