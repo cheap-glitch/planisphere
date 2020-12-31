@@ -1,5 +1,5 @@
 import { generateSitemaps, generateSitemapIndex } from '../src/index';
-import { indexes, wrapSitemap } from './helpers';
+import { indexes, wrapSitemap, wrapSitemapIndex } from './helpers';
 
 describe("generateSitemaps", () => {
 
@@ -233,6 +233,56 @@ describe("generateSitemaps", () => {
 			'\t\t<priority>0.7</priority>',
 			'\t</url>',
 		], true)]);
+
+	}); // }}}
+
+});
+
+describe("generateSitemapIndex", () => {
+
+	it("returns `undefined` if there's only a single sitemap", () => { // {{{
+
+		expect(generateSitemapIndex([])).toBe(undefined);
+		expect(generateSitemapIndex(['sitemap.xml'])).toBe(undefined);
+
+	}); // }}}
+
+	it("generates a sitemap index from file paths", () => { // {{{
+
+		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], {}, new Date('2020-01-01')))
+		.toEqual(wrapSitemapIndex([
+			'<sitemap><loc>sitemap-01.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
+			'<sitemap><loc>sitemap-02.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
+		]));
+
+	}); // }}}
+
+	it("generates a sitemap index from file paths and a base URL", () => { // {{{
+
+		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], { baseUrl: 'https://example.com' }, new Date('2020-01-01')))
+		.toEqual(wrapSitemapIndex([
+			'<sitemap><loc>https://example.com/sitemap-01.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
+			'<sitemap><loc>https://example.com/sitemap-02.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
+		]));
+
+	}); // }}}
+
+	it("generates formatted XML if pretty is set to `true`", () => { // {{{
+
+		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], {
+			baseUrl: 'https://example.com',
+			pretty:  true,
+		}, new Date('2020-01-01')))
+		.toEqual(wrapSitemapIndex([
+			'\t<sitemap>',
+			'\t\t<loc>https://example.com/sitemap-01.xml</loc>',
+			'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+			'\t</sitemap>',
+			'\t<sitemap>',
+			'\t\t<loc>https://example.com/sitemap-02.xml</loc>',
+			'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+			'\t</sitemap>',
+		], true));
 
 	}); // }}}
 
