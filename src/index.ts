@@ -19,7 +19,7 @@
  */
 
 import { resolve } from 'path';
-import { writeFileSync } from 'fs';
+import { writeFile } from 'fs/promises';
 
 const XML_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 const MAX_NB_URLS_IN_SITEMAP = 50000;
@@ -43,26 +43,26 @@ export interface SitemapUrl {
 	priority?:   SitemapUrlPriority,
 }
 
-export function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): void {
+export async function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Promise<void> {
 	const sitemaps = generateSitemaps(urls, options);
 	if (sitemaps.length === 0) {
 		return;
 	}
 	if (sitemaps.length === 1) {
-		writeFileSync(resolve(destination, 'sitemap.xml'), sitemaps[0]);
+		await writeFile(resolve(destination, 'sitemap.xml'), sitemaps[0]);
 		return;
 	}
 
 	const sitemapFilenames = sitemaps.map((_, index) => `sitemap-part-${(index + 1).toString().padStart(2, '0')}.xml`);
-	sitemaps.forEach((sitemap, index) => writeFileSync(resolve(destination, sitemapFilenames[index]), sitemap));
+	await Promise.all(sitemaps.map((sitemap, index) => writeFile(resolve(destination, sitemapFilenames[index]), sitemap)));
 
-	const sitemapIndex = generateSitemapIndex(sitemapFilenames, options);
+	const sitemapIndex = generateSitemapsIndex(sitemapFilenames, options);
 	if (sitemapIndex) {
-		writeFileSync(resolve(destination, 'sitemap.index.xml'), sitemapIndex);
+		await writeFile(resolve(destination, 'sitemap.index.xml'), sitemapIndex);
 	}
 }
 
-export function generateSitemapIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
+export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
 	if (sitemapFilenames.length <= 1) {
 		return undefined;
 	}
