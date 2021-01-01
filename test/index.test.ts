@@ -1,5 +1,9 @@
-import { generateSitemaps, generateSitemapIndex } from '../src/index';
+import 'expect-more-jest';
+import { resolve } from 'path';
+import { mkdtemp, rmdir, readFile, readdir } from 'fs/promises';
+
 import { indexes, wrapSitemap, wrapSitemapIndex } from './helpers';
+import { generateSitemaps, generateSitemapsIndex, writeSitemaps } from '../src/index';
 
 describe("generateSitemaps", () => {
 
@@ -238,18 +242,18 @@ describe("generateSitemaps", () => {
 
 });
 
-describe("generateSitemapIndex", () => {
+describe("generateSitemapsIndex", () => {
 
 	it("returns `undefined` if there's only a single sitemap", () => { // {{{
 
-		expect(generateSitemapIndex([])).toBe(undefined);
-		expect(generateSitemapIndex(['sitemap.xml'])).toBe(undefined);
+		expect(generateSitemapsIndex([])).toBe(undefined);
+		expect(generateSitemapsIndex(['sitemap.xml'])).toBe(undefined);
 
 	}); // }}}
 
 	it("generates a sitemap index from file paths", () => { // {{{
 
-		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], {}, new Date('2020-01-01')))
+		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], {}, new Date('2020-01-01')))
 		.toEqual(wrapSitemapIndex([
 			'<sitemap><loc>sitemap-01.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
 			'<sitemap><loc>sitemap-02.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
@@ -259,7 +263,7 @@ describe("generateSitemapIndex", () => {
 
 	it("generates a sitemap index from file paths and a base URL", () => { // {{{
 
-		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], { baseUrl: 'https://example.com' }, new Date('2020-01-01')))
+		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], { baseUrl: 'https://example.com' }, new Date('2020-01-01')))
 		.toEqual(wrapSitemapIndex([
 			'<sitemap><loc>https://example.com/sitemap-01.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
 			'<sitemap><loc>https://example.com/sitemap-02.xml</loc><lastmod>2020-01-01T00:00:00.000Z</lastmod></sitemap>',
@@ -269,7 +273,7 @@ describe("generateSitemapIndex", () => {
 
 	it("generates formatted XML if pretty is set to `true`", () => { // {{{
 
-		expect(generateSitemapIndex(['sitemap-01.xml', 'sitemap-02.xml'], {
+		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], {
 			baseUrl: 'https://example.com',
 			pretty:  true,
 		}, new Date('2020-01-01')))
@@ -283,6 +287,48 @@ describe("generateSitemapIndex", () => {
 			'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
 			'\t</sitemap>',
 		], true));
+
+	}); // }}}
+
+});
+
+describe("writeSitemaps", () => {
+
+	// Setup & teardown {{{
+
+	let tempDir: string;
+
+	beforeEach(async () => { tempDir = await mkdtemp('sitemaps-'); });
+	afterEach(() => rmdir(tempDir, { recursive: true, maxRetries: 3 }));
+
+	async function readSitemap(filename: string): Promise<string> {
+		return readFile(resolve(tempDir, filename), { encoding: 'utf8' });
+	}
+
+	// }}}
+
+	it("does nothing if no URLs are passed", async () => { // {{{
+
+		await writeSitemaps(tempDir, []);
+
+		await expect(readdir(tempDir)).resolves.toBeEmptyArray();
+
+	}); // }}}
+
+	it("can generate and write a single sitemap", async () => { // {{{
+
+		await writeSitemaps(tempDir, ['https://example.com', 'https://example.com/about']);
+
+		await expect(readdir(tempDir)).resolves.toEqual(['sitemap.xml'])
+		await expect(readSitemap('sitemap.xml')).resolves.toBe(wrapSitemap('<url><loc>https://example.com</loc></url><url><loc>https://example.com/about</loc></url>'));
+
+	}); // }}}
+
+	it("can generate and write several sitemaps with their sitemap index", async () => { // {{{
+
+		await writeSitemaps(tempDir, indexes(70000).map(index => `https://example.com/user/${index + 1}`));
+
+		await expect(readdir(tempDir)).resolves.toEqual(['sitemap-index.xml', 'sitemap-part-01.xml', 'sitemap-part-02.xml'])
 
 	}); // }}}
 

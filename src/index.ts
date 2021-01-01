@@ -57,8 +57,8 @@ export async function writeSitemaps(destination: string, urls: Array<string | Si
 	await Promise.all(sitemaps.map((sitemap, index) => writeFile(resolve(destination, sitemapFilenames[index]), sitemap)));
 
 	const sitemapIndex = generateSitemapsIndex(sitemapFilenames, options);
-	if (sitemapIndex) {
-		await writeFile(resolve(destination, 'sitemap.index.xml'), sitemapIndex);
+	if (sitemapIndex !== undefined) {
+		await writeFile(resolve(destination, 'sitemap-index.xml'), sitemapIndex);
 	}
 }
 
