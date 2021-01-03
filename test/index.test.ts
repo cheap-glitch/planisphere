@@ -129,7 +129,7 @@ describe("generateSitemaps", () => {
 				changefreq: 'monthly',
 				lastmod:    '2020-01-01',
 				priority:   0.3,
-			}
+			},
 		}))
 		.toEqual([wrapSitemap([
 			'<url>',
@@ -246,8 +246,8 @@ describe("generateSitemapsIndex", () => {
 
 	it("returns `undefined` if there's only a single sitemap", () => { // {{{
 
-		expect(generateSitemapsIndex([])).toBe(undefined);
-		expect(generateSitemapsIndex(['sitemap.xml'])).toBe(undefined);
+		expect(generateSitemapsIndex([])).toBeUndefined();
+		expect(generateSitemapsIndex(['sitemap.xml'])).toBeUndefined();
 
 	}); // }}}
 
@@ -297,8 +297,9 @@ describe("writeSitemaps", () => {
 	// Setup & teardown {{{
 
 	let tempDir: string;
-
-	beforeEach(async () => { tempDir = await mkdtemp('sitemaps-'); });
+	beforeEach(async () => {
+		tempDir = await mkdtemp('sitemaps-');
+	});
 	afterEach(() => rmdir(tempDir, { recursive: true, maxRetries: 3 }));
 
 	async function readSitemap(filename: string): Promise<string> {
@@ -319,7 +320,7 @@ describe("writeSitemaps", () => {
 
 		await writeSitemaps(tempDir, ['https://example.com', 'https://example.com/about']);
 
-		await expect(readdir(tempDir)).resolves.toEqual(['sitemap.xml'])
+		await expect(readdir(tempDir)).resolves.toEqual(['sitemap.xml']);
 		await expect(readSitemap('sitemap.xml')).resolves.toBe(wrapSitemap('<url><loc>https://example.com</loc></url><url><loc>https://example.com/about</loc></url>'));
 
 	}); // }}}
@@ -328,7 +329,7 @@ describe("writeSitemaps", () => {
 
 		await writeSitemaps(tempDir, indexes(70000).map(index => `https://example.com/user/${index + 1}`));
 
-		await expect(readdir(tempDir)).resolves.toEqual(['sitemap-index.xml', 'sitemap-part-01.xml', 'sitemap-part-02.xml'])
+		await expect(readdir(tempDir)).resolves.toEqual(['sitemap-index.xml', 'sitemap-part-01.xml', 'sitemap-part-02.xml']);
 
 	}); // }}}
 

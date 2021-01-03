@@ -80,7 +80,7 @@ export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: 
 		);
 	});
 
-	return XML_DOCTYPE + NL + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL + sitemaps.join(NL) + NL + '</sitemapindex>'
+	return XML_DOCTYPE + NL + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL + sitemaps.join(NL) + NL + '</sitemapindex>';
 }
 
 export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
@@ -135,7 +135,7 @@ function formatUrlLoc(loc: SitemapUrlLoc): string {
 		'>': 'gt',
 	} as { [index: string]: string };
 
-	return encodeURI(loc).replace(/[&'"<>]/g, character => '&' + replacements[character] + ';');
+	return encodeURI(loc).replace(/["&'<>]/g, character => '&' + replacements[character] + ';');
 }
 
 function formatUrlLastmod(lastmod: SitemapUrlLastmod): string {
@@ -143,8 +143,12 @@ function formatUrlLastmod(lastmod: SitemapUrlLastmod): string {
 }
 
 function formatUrPriority(priority: SitemapUrlPriority): string {
-	if (priority === 0) { return '0.0'; }
-	if (priority === 1) { return '1.0'; }
+	if (priority === 0) {
+		return '0.0';
+	}
+	if (priority === 1) {
+		return '1.0';
+	}
 
 	return priority.toString();
 }
