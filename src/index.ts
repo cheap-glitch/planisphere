@@ -48,12 +48,8 @@ export async function writeSitemaps(destination: string, urls: Array<string | Si
 	if (sitemaps.length === 0) {
 		return;
 	}
-	if (sitemaps.length === 1) {
-		await writeFile(resolve(destination, 'sitemap.xml'), sitemaps[0]);
-		return;
-	}
 
-	const sitemapFilenames = sitemaps.map((_, index) => `sitemap-part-${(index + 1).toString().padStart(2, '0')}.xml`);
+	const sitemapFilenames = (sitemaps.length === 1) ? ['sitemap.xml'] : sitemaps.map((_, index) => `sitemap-part-${(index + 1).toString().padStart(2, '0')}.xml`);
 	await Promise.all(sitemaps.map((sitemap, index) => writeFile(resolve(destination, sitemapFilenames[index]), sitemap)));
 
 	const sitemapIndex = generateSitemapsIndex(sitemapFilenames, options);
@@ -67,8 +63,8 @@ export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: 
 		return undefined;
 	}
 
-	const baseUrl = options.baseUrl  ? options.baseUrl.replace(/\/+$/, '') : '';
-	const pretty  = options?.pretty ?? false;
+	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
+	const pretty  = options.pretty ?? false;
 
 	const NL  = pretty ? '\n' : '';
 	const TAB = pretty ? '\t' : '';
@@ -85,8 +81,8 @@ export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: 
 
 export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
 	const baseUrl       = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
-	const trailingSlash = options?.trailingSlash ?? undefined;
-	const pretty        = options?.pretty ?? false;
+	const trailingSlash = options.trailingSlash ?? undefined;
+	const pretty        = options.pretty ?? false;
 
 	const NL  = pretty ? '\n' : '';
 	const TAB = pretty ? '\t' : '';
@@ -104,9 +100,9 @@ export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Part
 				loc = loc.slice(0, -1);
 			}
 
-			const lastmod    = ('lastmod'    in url) ? url.lastmod    : (options?.defaults?.lastmod    ?? undefined);
-			const changefreq = ('changefreq' in url) ? url.changefreq : (options?.defaults?.changefreq ?? undefined);
-			const priority   = ('priority'   in url) ? url.priority   : (options?.defaults?.priority   ?? undefined);
+			const lastmod    = ('lastmod'    in url) ? url.lastmod    : (options.defaults?.lastmod    ?? undefined);
+			const changefreq = ('changefreq' in url) ? url.changefreq : (options.defaults?.changefreq ?? undefined);
+			const priority   = ('priority'   in url) ? url.priority   : (options.defaults?.priority   ?? undefined);
 
 			sitemapUrls.push(TAB + xmlTag('url', NL +
 				TAB + TAB + xmlTag('loc', formatUrlLoc(loc)) + NL +
