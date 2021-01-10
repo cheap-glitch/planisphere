@@ -22,7 +22,7 @@ import { resolve } from 'path';
 import { writeFile } from 'fs/promises';
 
 const XML_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
-const MAX_NB_URLS_IN_SITEMAP = 50000;
+const MAX_NB_URLS_IN_SITEMAP = 50_000;
 
 export type SitemapUrlLoc        = string;
 export type SitemapUrlLastmod    = Date | number | string;

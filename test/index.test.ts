@@ -5,9 +5,9 @@ import { mkdtemp, rmdir, readFile, readdir } from 'fs/promises';
 import { indexes, wrapSitemap, wrapSitemapIndex } from './helpers';
 import { generateSitemaps, generateSitemapsIndex, writeSitemaps } from '../src/index';
 
-describe("generateSitemaps", () => {
+describe('generateSitemaps', () => {
 
-	it("generates a simple sitemap from full URLs", () => { // {{{
+	it('generates a simple sitemap from full URLs', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com', 'https://example.com/about']))
 		.toEqual([wrapSitemap('<url><loc>https://example.com</loc></url><url><loc>https://example.com/about</loc></url>')]);
@@ -17,7 +17,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("generates a simple sitemap from partial URLs and a base URL", () => { // {{{
+	it('generates a simple sitemap from partial URLs and a base URL', () => { // {{{
 
 		expect(generateSitemaps(['', 'about'], { baseUrl: 'https://example.com' }))
 		.toEqual([wrapSitemap('<url><loc>https://example.com</loc></url><url><loc>https://example.com/about</loc></url>')]);
@@ -39,7 +39,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("leaves trailing slashes untouched if `trailingSlash` is unspecified", () => { // {{{
+	it('leaves trailing slashes untouched if `trailingSlash` is unspecified', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com', 'https://example.com/about/', 'https://example.com/page']))
 		.toEqual([wrapSitemap([
@@ -57,7 +57,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("adds a trailing slash if `trailingSlash` is set to `true`", () => { // {{{
+	it('adds a trailing slash if `trailingSlash` is set to `true`', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com', 'https://example.com/about/', 'https://example.com/page'], { trailingSlash: true }))
 		.toEqual([wrapSitemap([
@@ -75,7 +75,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("remove trailing slashes if `trailingSlash` is set to `false`", () => { // {{{
+	it('remove trailing slashes if `trailingSlash` is set to `false`', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com', 'https://example.com/about/', 'https://example.com/page'], { trailingSlash: false }))
 		.toEqual([wrapSitemap([
@@ -93,7 +93,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("encodes URLs properly", () => { // {{{
+	it('encodes URLs properly', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com/search?color="always"&reverse-order']))
 		.toEqual([wrapSitemap('<url><loc>https://example.com/search?color=%22always%22&amp;reverse-order</loc></url>')]);
@@ -103,7 +103,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("takes URL meta tags into account", () => { // {{{
+	it('takes URL meta tags into account', () => { // {{{
 
 		expect(generateSitemaps([{
 			loc:        'https://example.com/about',
@@ -122,7 +122,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("takes default meta tags into account", () => { // {{{
+	it('takes default meta tags into account', () => { // {{{
 
 		expect(generateSitemaps(['https://example.com/about'], {
 			defaults: {
@@ -142,7 +142,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("prioritizes per-URL meta tags over global defaults", () => { // {{{
+	it('prioritizes per-URL meta tags over global defaults', () => { // {{{
 
 		expect(generateSitemaps([{
 			loc:        'https://example.com/about',
@@ -166,7 +166,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("handles dates in various formats", () => { // {{{
+	it('handles dates in various formats', () => { // {{{
 
 		expect(generateSitemaps([
 			{
@@ -179,7 +179,7 @@ describe("generateSitemaps", () => {
 			},
 			{
 				loc:     'https://example.com/page',
-				lastmod: 1578485826000,
+				lastmod: 1_578_485_826_000,
 			},
 		]))
 		.toEqual([wrapSitemap([
@@ -190,7 +190,7 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("writes whole-number priorities with a decimal", () => { // {{{
+	it('writes whole-number priorities with a decimal', () => { // {{{
 
 		expect(generateSitemaps([
 			{
@@ -209,18 +209,18 @@ describe("generateSitemaps", () => {
 
 	}); // }}}
 
-	it("generates several sitemaps if the total number of URLs exceeds 50,000", () => { // {{{
+	it('generates several sitemaps if the total number of URLs exceeds 50,000', () => { // {{{
 
-		expect(generateSitemaps(indexes(100001).map(i => `https://example.com/user/${i+1}`)))
+		expect(generateSitemaps(indexes(100_001).map(i => `https://example.com/user/${i+1}`)))
 		.toEqual([
-			wrapSitemap(indexes(50000).map(i => `<url><loc>https://example.com/user/${i+1}</loc></url>`)),
-			wrapSitemap(indexes(50000).map(i => `<url><loc>https://example.com/user/${i+50001}</loc></url>`)),
+			wrapSitemap(indexes(50_000).map(i => `<url><loc>https://example.com/user/${i+1}</loc></url>`)),
+			wrapSitemap(indexes(50_000).map(i => `<url><loc>https://example.com/user/${i+50_001}</loc></url>`)),
 			wrapSitemap('<url><loc>https://example.com/user/100001</loc></url>'),
 		]);
 
 	}); // }}}
 
-	it("generates formatted XML if pretty is set to `true`", () => { // {{{
+	it('generates formatted XML if pretty is set to `true`', () => { // {{{
 
 		expect(generateSitemaps(['/', '/about'], {
 			baseUrl:  'https://example.com',
@@ -242,7 +242,7 @@ describe("generateSitemaps", () => {
 
 });
 
-describe("generateSitemapsIndex", () => {
+describe('generateSitemapsIndex', () => {
 
 	it("returns `undefined` if there's only a single sitemap", () => { // {{{
 
@@ -251,7 +251,7 @@ describe("generateSitemapsIndex", () => {
 
 	}); // }}}
 
-	it("generates a sitemap index from file paths", () => { // {{{
+	it('generates a sitemap index from file paths', () => { // {{{
 
 		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], {}, new Date('2020-01-01')))
 		.toEqual(wrapSitemapIndex([
@@ -261,7 +261,7 @@ describe("generateSitemapsIndex", () => {
 
 	}); // }}}
 
-	it("generates a sitemap index from file paths and a base URL", () => { // {{{
+	it('generates a sitemap index from file paths and a base URL', () => { // {{{
 
 		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], { baseUrl: 'https://example.com' }, new Date('2020-01-01')))
 		.toEqual(wrapSitemapIndex([
@@ -271,7 +271,7 @@ describe("generateSitemapsIndex", () => {
 
 	}); // }}}
 
-	it("generates formatted XML if pretty is set to `true`", () => { // {{{
+	it('generates formatted XML if pretty is set to `true`', () => { // {{{
 
 		expect(generateSitemapsIndex(['sitemap-01.xml', 'sitemap-02.xml'], {
 			baseUrl: 'https://example.com',
@@ -292,7 +292,7 @@ describe("generateSitemapsIndex", () => {
 
 });
 
-describe("writeSitemaps", () => {
+describe('writeSitemaps', () => {
 
 	// Setup & teardown {{{
 
@@ -308,7 +308,7 @@ describe("writeSitemaps", () => {
 
 	// }}}
 
-	it("does nothing if no URLs are passed", async () => { // {{{
+	it('does nothing if no URLs are passed', async () => { // {{{
 
 		await writeSitemaps(tempDir, []);
 
@@ -316,7 +316,7 @@ describe("writeSitemaps", () => {
 
 	}); // }}}
 
-	it("can generate and write a single sitemap", async () => { // {{{
+	it('can generate and write a single sitemap', async () => { // {{{
 
 		await writeSitemaps(tempDir, ['https://example.com', 'https://example.com/about']);
 
@@ -325,9 +325,9 @@ describe("writeSitemaps", () => {
 
 	}); // }}}
 
-	it("can generate and write several sitemaps with their sitemap index", async () => { // {{{
+	it('can generate and write several sitemaps with their sitemap index', async () => { // {{{
 
-		await writeSitemaps(tempDir, indexes(70000).map(index => `https://example.com/user/${index + 1}`));
+		await writeSitemaps(tempDir, indexes(70_000).map(index => `https://example.com/user/${index + 1}`));
 
 		await expect(readdir(tempDir)).resolves.toEqual(['sitemap-index.xml', 'sitemap-part-01.xml', 'sitemap-part-02.xml']);
 
