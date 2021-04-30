@@ -1,6 +1,6 @@
 import 'expect-more-jest';
 import { resolve } from 'path';
-import { mkdtemp, rmdir, readFile, readdir } from 'fs/promises';
+import { mkdtemp, rm, readFile, readdir } from 'fs/promises';
 
 import { indexes, wrapSitemap, wrapSitemapIndex } from './helpers';
 import { generateSitemaps, generateSitemapsIndex, writeSitemaps } from '../src/index';
@@ -113,10 +113,10 @@ describe('generateSitemaps', () => {
 		}]))
 		.toEqual([wrapSitemap([
 			'<url>',
-			'<loc>https://example.com/about</loc>',
-			'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
-			'<changefreq>monthly</changefreq>',
-			'<priority>0.3</priority>',
+				'<loc>https://example.com/about</loc>',
+				'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+				'<changefreq>monthly</changefreq>',
+				'<priority>0.3</priority>',
 			'</url>',
 		])]);
 
@@ -133,10 +133,10 @@ describe('generateSitemaps', () => {
 		}))
 		.toEqual([wrapSitemap([
 			'<url>',
-			'<loc>https://example.com/about</loc>',
-			'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
-			'<changefreq>monthly</changefreq>',
-			'<priority>0.3</priority>',
+				'<loc>https://example.com/about</loc>',
+				'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+				'<changefreq>monthly</changefreq>',
+				'<priority>0.3</priority>',
 			'</url>',
 		])]);
 
@@ -157,10 +157,10 @@ describe('generateSitemaps', () => {
 		}))
 		.toEqual([wrapSitemap([
 			'<url>',
-			'<loc>https://example.com/about</loc>',
-			'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
-			'<changefreq>monthly</changefreq>',
-			'<priority>0.3</priority>',
+				'<loc>https://example.com/about</loc>',
+				'<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+				'<changefreq>monthly</changefreq>',
+				'<priority>0.3</priority>',
 			'</url>',
 		])]);
 
@@ -229,12 +229,12 @@ describe('generateSitemaps', () => {
 		}))
 		.toEqual([wrapSitemap([
 			'\t<url>',
-			'\t\t<loc>https://example.com</loc>',
-			'\t\t<priority>0.7</priority>',
+				'\t\t<loc>https://example.com</loc>',
+				'\t\t<priority>0.7</priority>',
 			'\t</url>',
 			'\t<url>',
-			'\t\t<loc>https://example.com/about</loc>',
-			'\t\t<priority>0.7</priority>',
+				'\t\t<loc>https://example.com/about</loc>',
+				'\t\t<priority>0.7</priority>',
 			'\t</url>',
 		], true)]);
 
@@ -244,7 +244,7 @@ describe('generateSitemaps', () => {
 
 describe('generateSitemapsIndex', () => {
 
-	it("returns `undefined` if there's only a single sitemap", () => { // {{{
+	it('returns `undefined` if there is only a single sitemap', () => { // {{{
 
 		expect(generateSitemapsIndex([])).toBeUndefined();
 		expect(generateSitemapsIndex(['sitemap.xml'])).toBeUndefined();
@@ -279,12 +279,12 @@ describe('generateSitemapsIndex', () => {
 		}, new Date('2020-01-01')))
 		.toEqual(wrapSitemapIndex([
 			'\t<sitemap>',
-			'\t\t<loc>https://example.com/sitemap-01.xml</loc>',
-			'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+				'\t\t<loc>https://example.com/sitemap-01.xml</loc>',
+				'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
 			'\t</sitemap>',
 			'\t<sitemap>',
-			'\t\t<loc>https://example.com/sitemap-02.xml</loc>',
-			'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
+				'\t\t<loc>https://example.com/sitemap-02.xml</loc>',
+				'\t\t<lastmod>2020-01-01T00:00:00.000Z</lastmod>',
 			'\t</sitemap>',
 		], true));
 
@@ -300,7 +300,7 @@ describe('writeSitemaps', () => {
 	beforeEach(async () => {
 		tempDir = await mkdtemp('sitemaps-');
 	});
-	afterEach(() => rmdir(tempDir, { recursive: true, maxRetries: 3 }));
+	afterEach(() => rm(tempDir, { recursive: true, maxRetries: 3 }));
 
 	async function readSitemap(filename: string): Promise<string> {
 		return readFile(resolve(tempDir, filename), { encoding: 'utf8' });
