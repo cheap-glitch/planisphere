@@ -28,11 +28,12 @@
     "build": "tsc",
     "build:clean": "rimraf build && npm run build",
     "build:watch": "tsc --watch",
-    "coverage": "jest --collectCoverage",
+    "coverage": "npm test -- --collectCoverage",
     "coverage:upload": "coveralls < .coverage/lcov.info",
     "lint": "eslint . --ext .ts --ignore-path .gitignore",
     "prepublishOnly": "npm run test && npm run build:clean",
-    "test": "jest"
+    "test": "jest --runInBand",
+    "test:watch": "npm test -- --watch"
   },
   "eslintConfig": {
     "root": true,
