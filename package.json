@@ -1,7 +1,7 @@
 {
   "name": "planisphere",
   "description": "A straightforward sitemap generator written in TypeScript.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "ISC",
   "repository": {
     "type": "git",
