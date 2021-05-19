@@ -65,9 +65,8 @@ export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: 
 
 	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
 	const pretty  = options.pretty ?? false;
-
-	const NL  = pretty ? '\n' : '';
-	const TAB = pretty ? '\t' : '';
+	const NL      = pretty ? '\n' : '';
+	const TAB     = pretty ? '\t' : '';
 
 	const sitemaps = sitemapFilenames.map(filename => {
 		return TAB + xmlTag('sitemap', NL +
@@ -111,6 +110,7 @@ export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Part
 				(priority   !== undefined ? TAB + TAB + xmlTag('priority',   formatUrPriority(priority)) + NL : '') + TAB
 			));
 		}
+
 		sitemaps.push(
 			XML_DOCTYPE + NL +
 			'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL +
