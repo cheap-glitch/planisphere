@@ -9,14 +9,12 @@
 ## Features
 
  * Generates sitemaps with [associated metadata](https://www.sitemaps.org/protocol.html#xmlTagDefinitions) for each URL
-
  * Escapes problematic URLs and can append/remove trailing slashes
-
  * Automatically splits large sitemaps (with 50,000+ URLs) and generates the associated index
 
 ## Installation
 
-```shell
+```
 npm i planisphere
 ```
 
@@ -38,12 +36,14 @@ writeSitemaps('dist', [
 	trailingSlash: false,
 	pretty: true,
 })
-.then(() => console.info('sitemap successfully generated!'));
+.then(() => {
+	console.info('Successfully generated sitemap');
+});
 ```
 
 ## API
 
-### `generateSitemaps(urls: Array<string | SitemapUrl>, options?): Array<string>`
+### generateSitemaps(urls: Array<string | SitemapUrl>, options?): Array<string>
 
 Returns an  array of  sitemaps contents.
 
@@ -64,6 +64,8 @@ An array of strings and/or objects with the following properties:
 
  * `priority: number | string`: a multiple of `0.1` between `0.0` and `1.0` (defaults to `0.5`)
 
+> For more information on those meta tags, you can consult the [official specification](https://www.sitemaps.org/protocol.html#xmlTagDefinitions).
+
 #### `options`
 
 An object with the following properties (all optional):
@@ -76,7 +78,7 @@ An object with the following properties (all optional):
 
  * `pretty: boolean`: `true` to pretty-print the outputted XML to be human-readable
 
-### `generateSitemapsIndex(files: Array<string>, options?, lastmod?): string?`
+### generateSitemapsIndex(files: Array<string>, options?, lastmod?): string?
 
 Returns the contents of a [sitemap index](https://www.sitemaps.org/protocol.html#index), or `undefined` if there is one filename or less.
 
@@ -88,7 +90,7 @@ The filenames of the sitemap(s).
 
 The last modification date of the sitemaps (defaults to the current timestamp).
 
-### `writeSitemaps(dest: string, urls: Array<string | SitemapUrl>, options?)`
+### writeSitemaps(dest: string, urls: Array<string | SitemapUrl>, options?)
 
 Generates and write the sitemap(s) to the disk. Returns a `Promise<void>`.
 
@@ -106,9 +108,9 @@ Contributions are welcomed! Please open an issue before proposing any significan
 
 ## Related
 
- * [www.sitemaps.org](https://www.sitemaps.org/protocol.html) - Detailed description of the Sitemaps protocol
- * [sitempap.js](https://github.com/ekalinin/sitemap.js) - Another sitemap generator (TypeScript)
- * [vue-cli-plugin-sitemap](https://github.com/cheap-glitch/vue-cli-plugin-sitemap) - This module as a Vue CLI plugin
+ * [`vue-cli-plugin-sitemap`](https://github.com/cheap-glitch/vue-cli-plugin-sitemap) – This module as a Vue CLI plugin
+ * [`sitempap.js`](https://github.com/ekalinin/sitemap.js) – Another sitemap generator (TypeScript)
+ * [www.sitemaps.org](https://www.sitemaps.org/protocol.html) – Detailed description of the Sitemaps protocol
 
 ## License
 
