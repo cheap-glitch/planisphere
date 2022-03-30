@@ -1,25 +1,24 @@
 {
   "name": "planisphere",
-  "description": "A straightforward sitemap generator written in TypeScript.",
   "version": "1.0.1",
+  "description": "A straightforward sitemap generator written in TypeScript.",
   "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cheap-glitch/planisphere.git"
-  },
-  "bugs": {
-    "url": "https://github.com/cheap-glitch/planisphere/issues"
-  },
   "author": "cheap glitch <cheap.glitch@gmail.com> (https://github.com/cheap-glitch)",
+  "repository": "cheap-glitch/planisphere",
   "homepage": "https://github.com/cheap-glitch/planisphere#readme",
+  "bugs": "https://github.com/cheap-glitch/planisphere/issues",
+  "funding": "https://github.com/sponsors/cheap-glitch",
   "keywords": [
+    "crawler",
+    "generator",
+    "index",
+    "navigation",
+    "robot",
+    "seo",
     "sitemap",
     "sitemaps",
-    "generator",
-    "navigation",
-    "crawling",
-    "crawlers",
-    "seo"
+    "urls",
+    "xml"
   ],
   "main": "build/index.js",
   "types": "build/index.d.ts",
