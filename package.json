@@ -20,22 +20,21 @@
     "urls",
     "xml"
   ],
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "build"
+    "dist"
   ],
   "directories": {
     "test": "test"
   },
   "scripts": {
     "build": "tsc",
-    "build:clean": "rimraf build && npm run build",
+    "build:clean": "empty-dir dist && npm run build",
     "build:watch": "tsc --watch",
     "coverage": "npm test -- --collectCoverage",
     "coverage:upload": "coveralls < .coverage/lcov.info",
     "lint": "eslint . --ext .ts --ignore-path .gitignore",
-    "prepublishOnly": "npm run test && npm run build:clean",
     "test": "jest --runInBand",
     "test:watch": "npm test -- --watch"
   },
@@ -49,7 +48,6 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node",
     "coverageDirectory": ".coverage"
   },
   "devDependencies": {

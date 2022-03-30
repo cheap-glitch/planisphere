@@ -1,14 +1,12 @@
 {
-  "extends": "@cheap-glitch/typescript-config/index.json",
-
+  "extends": "@cheap-glitch/tsconfig/index.json",
   "files": [
     "src/index.ts"
   ],
-
   "compilerOptions": {
-    "lib":    ["esnext"],
+    "lib": ["es2021"],
     "target": "es2018",
     "module": "commonjs",
-    "outDir": "build"
+    "outDir": "dist"
   }
 }
