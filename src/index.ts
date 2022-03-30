@@ -1,4 +1,5 @@
-/*!
+/*
+ *!
  * planisphere
  *
  * A straightforward sitemap generator written in TypeScript.
@@ -24,23 +25,23 @@ import { writeFile } from 'fs/promises';
 const XML_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 const MAX_NB_URLS_IN_SITEMAP = 50_000;
 
-export type SitemapUrlLoc        = string;
-export type SitemapUrlLastmod    = Date | number | string;
+export type SitemapUrlLoc = string;
+export type SitemapUrlLastmod = Date | number | string;
+export type SitemapUrlPriority = number | string;
 export type SitemapUrlChangefreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
-export type SitemapUrlPriority   = number | string;
 
 export interface Options {
-	defaults:      Partial<SitemapUrl>,
-	baseUrl:       string,
-	trailingSlash: boolean,
-	pretty:        boolean,
+	defaults: Partial<SitemapUrl>;
+	baseUrl: string;
+	trailingSlash: boolean;
+	pretty: boolean;
 }
 
 export interface SitemapUrl {
-	loc:         SitemapUrlLoc,
-	lastmod?:    SitemapUrlLastmod,
-	changefreq?: SitemapUrlChangefreq,
-	priority?:   SitemapUrlPriority,
+	loc: SitemapUrlLoc;
+	lastmod?: SitemapUrlLastmod;
+	priority?: SitemapUrlPriority;
+	changefreq?: SitemapUrlChangefreq;
 }
 
 export async function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<Options> = {}): Promise<void> {
@@ -49,7 +50,7 @@ export async function writeSitemaps(destination: string, urls: Array<string | Si
 		return;
 	}
 
-	const sitemapFilenames = (sitemaps.length === 1) ? ['sitemap.xml'] : sitemaps.map((_, index) => `sitemap-part-${(index + 1).toString().padStart(2, '0')}.xml`);
+	const sitemapFilenames = sitemaps.length === 1 ? ['sitemap.xml'] : sitemaps.map((_, index) => `sitemap-part-${String(index + 1).padStart(2, '0')}.xml`);
 	await Promise.all(sitemaps.map((sitemap, index) => writeFile(resolve(destination, sitemapFilenames[index]), sitemap)));
 
 	const sitemapIndex = generateSitemapsIndex(sitemapFilenames, options);
@@ -58,84 +59,84 @@ export async function writeSitemaps(destination: string, urls: Array<string | Si
 	}
 }
 
-export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: Partial<Options> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
+export function generateSitemapsIndex(sitemapFilenames: string[], options: Partial<Options> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
 	if (sitemapFilenames.length <= 1) {
 		return undefined;
 	}
 
-	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
-	const pretty  = options.pretty ?? false;
-	const NL      = pretty ? '\n' : '';
-	const TAB     = pretty ? '\t' : '';
+	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/u, '') : '';
+	const pretty = options.pretty ?? false;
+	const NL = pretty ? '\n' : '';
+	const TAB = pretty ? '\t' : '';
 
 	const sitemaps = sitemapFilenames.map(filename => {
-		return TAB + xmlTag('sitemap', NL +
-			TAB + TAB + xmlTag('loc',     [baseUrl, filename].filter(Boolean).join('/')) + NL +
-			TAB + TAB + xmlTag('lastmod', formatUrlLastmod(lastmod)) + NL + TAB
+		return TAB + xmlTag('sitemap', NL
+			+ TAB + TAB + xmlTag('loc', [baseUrl, filename].filter(Boolean).join('/')) + NL
+			+ TAB + TAB + xmlTag('lastmod', formatUrlLastmod(lastmod)) + NL + TAB,
 		);
 	});
 
 	return XML_DOCTYPE + NL + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL + sitemaps.join(NL) + NL + '</sitemapindex>';
 }
 
-export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<Options> = {}): Array<string> {
-	const baseUrl       = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
+export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<Options> = {}): string[] {
+	const baseUrl = options.baseUrl ? options.baseUrl.replace(/\/+$/u, '') : '';
 	const trailingSlash = options.trailingSlash ?? undefined;
-	const pretty        = options.pretty ?? false;
+	const pretty = options.pretty ?? false;
 
-	const NL  = pretty ? '\n' : '';
+	const NL = pretty ? '\n' : '';
 	const TAB = pretty ? '\t' : '';
 
 	const sitemaps = [];
 	for (let offset = 0; offset < Math.ceil(urls.length / MAX_NB_URLS_IN_SITEMAP); offset++) {
 		const sitemapUrls = [];
-		for (let i = offset*MAX_NB_URLS_IN_SITEMAP; i < (offset + 1)*MAX_NB_URLS_IN_SITEMAP && i < urls.length; i++) {
-			const url = (typeof urls[i] === 'string' ? { loc: urls[i] } : urls[i]) as SitemapUrl;
+		for (let index = offset * MAX_NB_URLS_IN_SITEMAP; index < (offset + 1) * MAX_NB_URLS_IN_SITEMAP && index < urls.length; index++) {
+			const url = (typeof urls[index] === 'string' ? { loc: urls[index] } : urls[index]) as SitemapUrl;
 
-			let loc = [baseUrl, url.loc.replace(/^\//, '')].filter(Boolean).join('/');
+			let loc = [baseUrl, url.loc.replace(/^\//u, '')].filter(Boolean).join('/');
 			if (trailingSlash === true && !loc.endsWith('/')) {
 				loc += '/';
 			} else if (trailingSlash === false && loc.endsWith('/')) {
 				loc = loc.slice(0, -1);
 			}
 
-			const lastmod    = ('lastmod'    in url) ? url.lastmod    : (options.defaults?.lastmod    ?? undefined);
-			const changefreq = ('changefreq' in url) ? url.changefreq : (options.defaults?.changefreq ?? undefined);
-			const priority   = ('priority'   in url) ? url.priority   : (options.defaults?.priority   ?? undefined);
+			const lastmod = 'lastmod' in url ? url.lastmod : options.defaults?.lastmod ?? undefined;
+			const priority = 'priority' in url ? url.priority : options.defaults?.priority ?? undefined;
+			const changefreq = 'changefreq' in url ? url.changefreq : options.defaults?.changefreq ?? undefined;
 
-			sitemapUrls.push(TAB + xmlTag('url', NL +
-				TAB + TAB + xmlTag('loc', formatUrlLoc(loc)) + NL +
-				(lastmod    !== undefined ? TAB + TAB + xmlTag('lastmod',    formatUrlLastmod(lastmod))  + NL : '') +
-				(changefreq !== undefined ? TAB + TAB + xmlTag('changefreq', changefreq)                 + NL : '') +
-				(priority   !== undefined ? TAB + TAB + xmlTag('priority',   formatUrPriority(priority)) + NL : '') + TAB
+			sitemapUrls.push(TAB + xmlTag('url', NL
+				+ TAB + TAB + xmlTag('loc', formatUrlLoc(loc)) + NL
+				+ (lastmod === undefined ? '' : TAB + TAB + xmlTag('lastmod', formatUrlLastmod(lastmod)) + NL)
+				+ (priority === undefined ? '' : TAB + TAB + xmlTag('priority', formatUrPriority(priority)) + NL)
+				+ (changefreq === undefined ? '' : TAB + TAB + xmlTag('changefreq', changefreq) + NL) + TAB,
 			));
 		}
 
 		sitemaps.push(
-			XML_DOCTYPE + NL +
-			'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL +
-				sitemapUrls.join(NL) + NL +
-			'</urlset>'
+			XML_DOCTYPE + NL
+			+ '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL
+				+ sitemapUrls.join(NL) + NL
+			+ '</urlset>',
 		);
 	}
 
 	return sitemaps;
 }
 
-function formatUrlLoc(loc: SitemapUrlLoc): string {
-	const replacements = {
-		'&': 'amp',
-		"'": 'apos',
-		'"': 'quot',
-		'<': 'lt',
-		'>': 'gt',
-	} as { [index: string]: string };
+const replacements: Record<string, string> = {
+	'&': 'amp',
+	"'": 'apos',
+	'"': 'quot',
+	'<': 'lt',
+	'>': 'gt',
+};
 
-	return encodeURI(loc).replace(/["&'<>]/g, character => '&' + replacements[character] + ';');
+function formatUrlLoc(loc: SitemapUrlLoc): string {
+	return encodeURI(loc).replace(/["&'<>]/ug, character => '&' + replacements[character] + ';');
 }
 
 function formatUrlLastmod(lastmod: SitemapUrlLastmod): string {
-	return ((lastmod instanceof Date) ? lastmod : new Date(lastmod)).toISOString();
+	return (lastmod instanceof Date ? lastmod : new Date(lastmod)).toISOString();
 }
 
 function formatUrPriority(priority: SitemapUrlPriority): string {
@@ -146,7 +147,7 @@ function formatUrPriority(priority: SitemapUrlPriority): string {
 		return '1.0';
 	}
 
-	return priority.toString();
+	return String(priority);
 }
 
 function xmlTag(tag: string, contents: string): string {
