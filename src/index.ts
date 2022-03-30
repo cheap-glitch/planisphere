@@ -29,7 +29,7 @@ export type SitemapUrlLastmod    = Date | number | string;
 export type SitemapUrlChangefreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
 export type SitemapUrlPriority   = number | string;
 
-interface GenerateOptions {
+export interface Options {
 	defaults:      Partial<SitemapUrl>,
 	baseUrl:       string,
 	trailingSlash: boolean,
@@ -43,7 +43,7 @@ export interface SitemapUrl {
 	priority?:   SitemapUrlPriority,
 }
 
-export async function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Promise<void> {
+export async function writeSitemaps(destination: string, urls: Array<string | SitemapUrl>, options: Partial<Options> = {}): Promise<void> {
 	const sitemaps = generateSitemaps(urls, options);
 	if (sitemaps.length === 0) {
 		return;
@@ -58,7 +58,7 @@ export async function writeSitemaps(destination: string, urls: Array<string | Si
 	}
 }
 
-export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: Partial<GenerateOptions> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
+export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: Partial<Options> = {}, lastmod: SitemapUrlLastmod = new Date()): string | undefined {
 	if (sitemapFilenames.length <= 1) {
 		return undefined;
 	}
@@ -78,7 +78,7 @@ export function generateSitemapsIndex(sitemapFilenames: Array<string>, options: 
 	return XML_DOCTYPE + NL + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + NL + sitemaps.join(NL) + NL + '</sitemapindex>';
 }
 
-export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<GenerateOptions> = {}): Array<string> {
+export function generateSitemaps(urls: Array<string | SitemapUrl>, options: Partial<Options> = {}): Array<string> {
 	const baseUrl       = options.baseUrl ? options.baseUrl.replace(/\/+$/, '') : '';
 	const trailingSlash = options.trailingSlash ?? undefined;
 	const pretty        = options.pretty ?? false;
